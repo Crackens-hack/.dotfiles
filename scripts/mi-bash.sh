@@ -88,5 +88,7 @@ create_symlinks
 
 # Ejecutar source para aplicar los cambios de .bashrc
 source "/home/$usuario/.bashrc"
+sleep 1  # Un pequeño delay por si hay procesos pendientes
+source "/home/$usuario/.bashrc"
 
 echo "Proceso completado con éxito."
