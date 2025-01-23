@@ -58,7 +58,7 @@ fi
 
 # Define useful aliases
 alias sb='source ~/.bashrc'   # Recargar bashrc
-alias cls='clear'             # Limpiar pantalla
+alias cls='clear ; ls'             # Limpiar pantalla
 alias df='df -h'              # Mostrar espacio en disco en formato legible
 alias free='free -m'          # Ver memoria en MB
 alias ..='cd ..'              # Subir un nivel
