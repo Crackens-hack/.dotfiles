@@ -89,3 +89,6 @@ set_permissions_bashrc
 create_symlinks
 
 echo "Proceso completado con éxito."
+
+
+#### esta claro que estara perfecto creo
