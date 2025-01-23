@@ -4,7 +4,7 @@
 check_root() {
     if [ "$(id -u)" -ne 0 ]; then
         echo "No eres root. Intentando cambiar a root..."
-        # Intentar cambiar a root sin contraseña si está configurado en Dockerfile
+        # Si estamos configurados para sudo sin contraseña, no debería preguntar
         sudo -v
         if [ $? -ne 0 ]; then
             echo "No se pudo obtener privilegios de root. Saliendo..."
@@ -17,41 +17,17 @@ check_root() {
 check_bash() {
     if ! command -v bash &> /dev/null; then
         echo "Bash no está instalado. Intentando instalarlo..."
-
-        # Verificar apt primero
+        
         if command -v apt &> /dev/null; then
             sudo apt update && sudo apt install bash -y
-            if [ $? -ne 0 ]; then
-                echo "Error al instalar bash con apt. Intentando con apk..."
-                install_bash_apk
-            fi
-        # Si apt no está disponible, intenta con apk
         elif command -v apk &> /dev/null; then
             sudo apk add bash
-            if [ $? -ne 0 ]; then
-                echo "Error al instalar bash con apk. Saliendo..."
-                exit 1
-            fi
         else
-            echo "No se encontró un gestor de paquetes adecuado (ni apt ni apk). Saliendo..."
+            echo "No se encontró un gestor de paquetes adecuado. Saliendo..."
             exit 1
         fi
     else
         echo "Bash ya está instalado."
-    fi
-}
-
-# Intentar instalar bash usando apk si apt falla
-install_bash_apk() {
-    if command -v apk &> /dev/null; then
-        sudo apk add bash
-        if [ $? -ne 0 ]; then
-            echo "Error al instalar bash con apk. Saliendo..."
-            exit 1
-        fi
-    else
-        echo "No se pudo encontrar apk para instalar bash. Saliendo..."
-        exit 1
     fi
 }
 
@@ -60,10 +36,6 @@ remove_root_bashrc() {
     if [ -f /root/.bashrc ]; then
         echo "Eliminando .bashrc de root..."
         sudo rm /root/.bashrc
-        if [ $? -ne 0 ]; then
-            echo "Error al eliminar .bashrc de root. Saliendo..."
-            exit 1
-        fi
     fi
 }
 
@@ -76,10 +48,6 @@ remove_user_bashrc() {
     if [ -f "$user_bashrc" ]; then
         echo "Eliminando .bashrc del usuario $usuario..."
         rm "$user_bashrc"
-        if [ $? -ne 0 ]; then
-            echo "Error al eliminar .bashrc del usuario. Saliendo..."
-            exit 1
-        fi
     else
         echo "No se encontró .bashrc en /home/$usuario. Creando uno nuevo."
     fi
@@ -97,10 +65,6 @@ set_permissions_bashrc() {
     fi
 
     sudo chmod 644 "$bashrc_in_dotfiles"
-    if [ $? -ne 0 ]; then
-        echo "Error al otorgar permisos al archivo .bashrc. Saliendo..."
-        exit 1
-    fi
 }
 
 # Crear enlaces simbólicos
@@ -109,17 +73,9 @@ create_symlinks() {
 
     # Enlace simbólico para root
     sudo ln -sf "$bashrc_in_dotfiles" /root/.bashrc
-    if [ $? -ne 0 ]; then
-        echo "Error al crear el enlace simbólico para root. Saliendo..."
-        exit 1
-    fi
 
     # Enlace simbólico para el usuario
     ln -sf "$bashrc_in_dotfiles" "/home/$usuario/.bashrc"
-    if [ $? -ne 0 ]; then
-        echo "Error al crear el enlace simbólico para el usuario. Saliendo..."
-        exit 1
-    fi
 
     echo "Enlaces simbólicos creados correctamente."
 }
