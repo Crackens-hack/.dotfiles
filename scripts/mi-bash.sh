@@ -86,4 +86,7 @@ remove_user_bashrc
 set_permissions_bashrc
 create_symlinks
 
+# Ejecutar source para aplicar los cambios de .bashrc
+source "/home/$usuario/.bashrc"
+
 echo "Proceso completado con éxito."
