@@ -4,11 +4,17 @@
 check_root() {
     if [ "$(id -u)" -ne 0 ]; then
         echo "No eres root. Intentando cambiar a root..."
-        # Si estamos configurados para sudo sin contraseña, no debería preguntar
-        sudo -v
+        
+        # Intentamos con sudo -i primero
+        sudo -i
         if [ $? -ne 0 ]; then
-            echo "No se pudo obtener privilegios de root. Saliendo..."
-            exit 1
+            # Si no se pudo obtener root con sudo -i, intentamos con sudo normal
+            echo "No se pudo obtener privilegios de root con sudo -i. Intentando con sudo..."
+            sudo -v
+            if [ $? -ne 0 ]; then
+                echo "No se pudo obtener privilegios de root. Saliendo..."
+                exit 1
+            fi
         fi
     fi
 }
@@ -89,6 +95,3 @@ set_permissions_bashrc
 create_symlinks
 
 echo "Proceso completado con éxito."
-
-
-#### esta claro que estara perfecto creo
