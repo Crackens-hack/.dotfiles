@@ -5,17 +5,9 @@ check_root() {
     if [ "$(id -u)" -ne 0 ]; then
         echo "No eres root. Intentando cambiar a root..."
         
-        # Intentamos con sudo -i primero
-        sudo -i
-        if [ $? -ne 0 ]; then
-            # Si no se pudo obtener root con sudo -i, intentamos con sudo normal
-            echo "No se pudo obtener privilegios de root con sudo -i. Intentando con sudo..."
-            sudo -v
-            if [ $? -ne 0 ]; then
-                echo "No se pudo obtener privilegios de root. Saliendo..."
-                exit 1
-            fi
-        fi
+        # Intentamos con sudo -i primero, pero ejecutamos el script como root
+        sudo -E "$0" "$@"
+        exit 0
     fi
 }
 
